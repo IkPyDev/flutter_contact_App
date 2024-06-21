@@ -1,13 +1,19 @@
 import 'package:flutter/material.dart';
+import '../data/Firebase_manager.dart';
 import '../data/SharedPrefsManager.dart';
 import 'home.dart';
 
 class Update extends StatefulWidget {
-  final int index;
+  final String id;
   final String initialName;
   final String initialNumber;
 
-  const Update({super.key, required this.index, required this.initialName, required this.initialNumber});
+  const Update({
+    super.key,
+    required this.id,
+    required this.initialName,
+    required this.initialNumber,
+  });
 
   @override
   State<Update> createState() => _UpdateState();
@@ -35,7 +41,7 @@ class _UpdateState extends State<Update> {
     String name = _nameController.text;
     String number = _numberController.text;
 
-    await SharedPrefsManager().editContact(widget.index, name, number);
+    await FirebaseManager().updateContact(widget.id, name, number);
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(builder: (context) => const Home()),
@@ -52,7 +58,7 @@ class _UpdateState extends State<Update> {
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: <Widget>[
-            Image.asset("assets/edit.png"),
+            Image.asset("assets/update_contact.png"),
             const SizedBox(height: 20),
             TextField(
               controller: _nameController,
@@ -69,9 +75,11 @@ class _UpdateState extends State<Update> {
             ),
             const SizedBox(height: 20),
             TextField(
+              keyboardType: TextInputType.phone,
+
               controller: _numberController,
               decoration: InputDecoration(
-                labelText: 'Phone Number',
+                labelText: 'Phone',
                 border: const OutlineInputBorder(),
                 suffixIcon: IconButton(
                   icon: Icon(Icons.clear),

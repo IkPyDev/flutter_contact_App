@@ -1,7 +1,8 @@
 import 'package:contact_app_gita/cons/text_steles.dart';
 import 'package:contact_app_gita/ui/add.dart';
 import 'package:flutter/material.dart';
-import '../data/SharedPrefsManager.dart';
+import '../data/Firebase_manager.dart';
+import '../data/UserData.dart';
 import 'login.dart';
 import 'update.dart';
 import '../cons/app_icons.dart';
@@ -26,11 +27,11 @@ class Home extends StatelessWidget {
               ),
               GestureDetector(
                 onTap: () async {
-                  showDialog(context: context, builder: (BuildContext c){
-                    return Dialog(child:
-                    logoutUi(context) );
-                  })
-                  ;
+                  showDialog(
+                      context: context,
+                      builder: (BuildContext c) {
+                        return Dialog(child: logoutUi(context));
+                      });
                 },
                 child: Image.asset(
                   AppIcons.logout,
@@ -51,21 +52,17 @@ class Home extends StatelessWidget {
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(50),
                 child: FloatingActionButton(
-                
                   onPressed: () {
-                    // ScaffoldMessenger.of(context).showSnackBar(
-                    //   const SnackBar(
-                    //     content: Text("Username or password is incorrect"),
-                    //   ),
-                    // );
                     Navigator.pushReplacement(
                       context,
                       MaterialPageRoute(builder: (context) => const Add()),
                     );
                   },
-                  
                   backgroundColor: Colors.white,
-                  child: Image.asset(AppIcons.add,color: Colors.red,),
+                  child: Image.asset(
+                    AppIcons.add,
+                    color: Colors.red,
+                  ),
                 ),
               ),
             ),
@@ -77,7 +74,7 @@ class Home extends StatelessWidget {
 }
 
 Widget contactItems(
-    BuildContext context, String name, String number, int index) =>
+    BuildContext context, String id, String name, String number) =>
     SizedBox(
       height: 80,
       child: Row(
@@ -113,17 +110,18 @@ Widget contactItems(
                   context,
                   MaterialPageRoute(
                     builder: (context) => Update(
-                      index: index,
+                      id: id,
                       initialName: name,
                       initialNumber: number,
                     ),
                   ),
                 );
               } else if (value == 'Delete') {
-                showDialog(context: context, builder: (BuildContext context){
-                  return Dialog(child: delete(index, name,context));
-                });
-
+                showDialog(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return Dialog(child: delete(id, name, context));
+                    });
               }
             },
             itemBuilder: (BuildContext context) {
@@ -139,169 +137,195 @@ Widget contactItems(
       ),
     );
 
-Widget contact() => FutureBuilder<List<Map<String, String>>>(
-  future: SharedPrefsManager().getContacts(),
-  builder: (context, snapshot) {
-    if (snapshot.connectionState == ConnectionState.waiting) {
-      return const Center(child: CircularProgressIndicator());
-    } else if (snapshot.hasError) {
-      return Center(child: Text("Error: ${snapshot.error}"));
-    } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-      return const Center(child: Text("No contacts available"));
-    } else {
-      return ListView.separated(separatorBuilder: (_,__){
-        return const Divider(height: 2,color: Colors.grey);
-      },
-        itemCount: snapshot.data!.length,
-        itemBuilder: (context, index) {
-          var contact = snapshot.data![index];
-          return contactItems(
-              context, contact['name']!, contact['number']!, index);
-        },
-      );
-    }
-  },
-);
+Widget contact() {
+  return StreamBuilder<List<UserData>>(
+    stream: FirebaseManager().getContacts(),
+    builder: (context, snapshot) {
+      if (snapshot.connectionState == ConnectionState.waiting) {
+        return const Center(child: CircularProgressIndicator());
+      } else if (snapshot.hasError) {
+        return Center(child: Text("Error: ${snapshot.error}"));
+      } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+        return const Center(child: Text("No contacts available"));
+      } else {
+        return ListView.separated(
+          separatorBuilder: (_, __) {
+            return const Divider(height: 2, color: Colors.grey);
+          },
+          itemCount: snapshot.data!.length,
+          itemBuilder: (context, index) {
+            var contact = snapshot.data![index];
+            return contactItems(
+                context, contact.id, contact.name, contact.phone);
+          },
+        );
+      }
+    },
+  );
+}
 
-Widget delete(int index,String name,BuildContext context) =>Container(
-
-  child: Container(
-    height: 200,
-    padding: const EdgeInsets.all(12.0),
-    child: Column(
-      children: [
-        Row(
-          children: [
-            Icon(Icons.delete_forever,color: Colors.red,size: 36,),
-            Spacer(),
-            Text("Delete contact",style: TextStyle(color: Colors.grey,fontSize: 16),)
-            ,Spacer(),
-            InkWell(
-                onTap: (){
-                  Navigator.pop(context);
-                },
-                child: Container(color:Colors.red,child: Icon(Icons.close_sharp,color: Colors.white,)))
-          ],
-        ),
-        SizedBox(height: 10,),
-        RichText(text:TextSpan(text: "Do you want delete ",style: TextStyle(fontSize: 16,color: Colors.grey,),children: [
-          TextSpan(text: name,style: TextStyle(fontSize: 14,color: Colors.black45))
-        ])),
-        SizedBox(height: 60,),
-        Row(
-          children: [
-            Spacer(),
-            Container(
-              alignment: Alignment.bottomCenter,
-              height: 50,
-              width: 120,
-              decoration: BoxDecoration(
-                color: Colors.red,
-                borderRadius: BorderRadius.circular(18)
-              ),
-              child: InkWell(
-                  onTap: () async {
-
-                    await SharedPrefsManager().deleteContact(index);
-                    // Reload Home screen
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(builder: (context) => const Home()),
-                    );
-
-
-                  },
-                  child: const Center(child: Text("Delete",style: TextStyle(fontSize: 18,color: Colors.white,fontWeight: FontWeight.bold),))),
-            ),
-          ],
-        )
-      ],
-    ),
-  ),
-
-);
-
-Widget logoutUi(BuildContext context) =>Container(
-
-  child: Container(
-    height: 200,
-    padding: const EdgeInsets.all(12.0),
-    child: Column(
-      children: [
-        Row(
-          children: [
-            Icon(Icons.delete_forever,color: Colors.red,size: 36,),
-            Spacer(),
-            Text("Delete contact",style: TextStyle(color: Colors.grey,fontSize: 16),)
-            ,Spacer(),
-            InkWell(
-                onTap: (){
-                  Navigator.pop(context);
-                },
-                child: InkWell(
-                    onTap: (){
-                      Navigator.pop(context);
-
-                    },
-                    child: Container(color:Colors.red,child: Icon(Icons.close_sharp,color: Colors.white,))))
-          ],
-        ),
-        SizedBox(height: 10,),
-        RichText(text:TextSpan(text: "Do you want ",style: TextStyle(fontSize: 16,color: Colors.grey,),children: [
-          TextSpan(text: "unregister or logout?",style: TextStyle(fontSize: 14,color: Colors.grey))
-        ])),
-        SizedBox(height: 60,),
-        Row(
-          children: <Widget>[
-            Container(
-              alignment: Alignment.bottomCenter,
-              height: 50,
-              width: 120,
-              decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(18),
-                border: Border.all(color: Colors.red,width: 1)
-              ),
-              child: InkWell(
-                  onTap: () async {
-
-                    await SharedPrefsManager().clearAll();
-                    // Reload Home screen
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(builder: (context) => const Login()),
-                    );
-
-
-                  },
-                  child: const Center(child: Text("UnRegister",style: TextStyle(fontSize: 18,color: Colors.red,fontWeight: FontWeight.bold),))),
-            ),
-            const Spacer(),
-            Container(
-              alignment: Alignment.bottomCenter,
-              height: 50,
-              width: 120,
-              decoration: BoxDecoration(
+Widget delete(String id, String name, BuildContext context) => Container(
+  height: 200,
+  padding: const EdgeInsets.all(12.0),
+  child: Column(
+    children: [
+      Row(
+        children: [
+          Icon(Icons.delete_forever, color: Colors.red, size: 36),
+          Spacer(),
+          Text(
+            "Delete contact",
+            style: TextStyle(color: Colors.grey, fontSize: 16),
+          ),
+          Spacer(),
+          InkWell(
+              onTap: () {
+                Navigator.pop(context);
+              },
+              child: Container(
                   color: Colors.red,
-                  borderRadius: BorderRadius.circular(18)
-              ),
-              child: InkWell(
-                  onTap: () async {
-
-                    // Reload Home screen
-                    await SharedPrefsManager().logout();
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(builder: (context) => const Login()),
-                    );
-
-                  },
-                  child: const Center(child: Text("Logout",style: TextStyle(fontSize: 18,color: Colors.white,fontWeight: FontWeight.bold),))),
-            ),
+                  child: Icon(Icons.close_sharp, color: Colors.white)))
+        ],
+      ),
+      SizedBox(height: 10),
+      RichText(
+        text: TextSpan(
+          text: "Do you want to delete ",
+          style: TextStyle(fontSize: 16, color: Colors.grey),
+          children: [
+            TextSpan(
+              text: name,
+              style: TextStyle(fontSize: 14, color: Colors.black45),
+            )
           ],
-        )
-      ],
-    ),
+        ),
+      ),
+      SizedBox(height: 60),
+      Row(
+        children: [
+          Spacer(),
+          Container(
+            alignment: Alignment.bottomCenter,
+            height: 50,
+            width: 120,
+            decoration: BoxDecoration(
+                color: Colors.red, borderRadius: BorderRadius.circular(18)),
+            child: InkWell(
+                onTap: () async {
+                  await FirebaseManager().deleteContact(id);
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(builder: (context) => const Home()),
+                  );
+                },
+                child: const Center(
+                    child: Text(
+                      "Delete",
+                      style: TextStyle(
+                          fontSize: 18,
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold),
+                    ))),
+          ),
+        ],
+      )
+    ],
   ),
+);
 
+Widget logoutUi(BuildContext context) => Container(
+  height: 200,
+  padding: const EdgeInsets.all(12.0),
+  child: Column(
+    children: [
+      Row(
+        children: [
+          Icon(Icons.delete_forever, color: Colors.red, size: 36),
+          Spacer(),
+          Text(
+            "Delete contact",
+            style: TextStyle(color: Colors.grey, fontSize: 16),
+          ),
+          Spacer(),
+          InkWell(
+              onTap: () {
+                Navigator.pop(context);
+              },
+              child: InkWell(
+                  onTap: () {
+                    Navigator.pop(context);
+                  },
+                  child: Container(
+                      color: Colors.red,
+                      child: Icon(Icons.close_sharp, color: Colors.white))))
+        ],
+      ),
+      SizedBox(height: 10),
+      RichText(
+        text: TextSpan(
+          text: "Do you want to ",
+          style: TextStyle(fontSize: 16, color: Colors.grey),
+          children: [
+            TextSpan(
+                text: "unregister or logout?",
+                style: TextStyle(fontSize: 14, color: Colors.grey))
+          ],
+        ),
+      ),
+      SizedBox(height: 60),
+      Row(
+        children: <Widget>[
+          Container(
+            alignment: Alignment.bottomCenter,
+            height: 50,
+            width: 120,
+            decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(18),
+                border: Border.all(color: Colors.red, width: 1)),
+            child: InkWell(
+                onTap: () async {
+                  await FirebaseManager().clearAll();
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(builder: (context) => const Login()),
+                  );
+                },
+                child: const Center(
+                    child: Text(
+                      "UnRegister",
+                      style: TextStyle(
+                          fontSize: 18,
+                          color: Colors.red,
+                          fontWeight: FontWeight.bold),
+                    ))),
+          ),
+          const Spacer(),
+          Container(
+            alignment: Alignment.bottomCenter,
+            height: 50,
+            width: 120,
+            decoration: BoxDecoration(
+                color: Colors.red, borderRadius: BorderRadius.circular(18)),
+            child: InkWell(
+                onTap: () async {
+                  await FirebaseManager().logout();
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(builder: (context) => const Login()),
+                  );
+                },
+                child: const Center(
+                    child: Text(
+                      "Logout",
+                      style: TextStyle(
+                          fontSize: 18,
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold),
+                    ))),
+          ),
+        ],
+      )
+    ],
+  ),
 );

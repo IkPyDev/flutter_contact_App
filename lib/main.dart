@@ -1,15 +1,15 @@
-import 'package:contact_app_gita/ui/add.dart';
-import 'package:contact_app_gita/ui/home.dart';
-import 'package:contact_app_gita/ui/login.dart';
-import 'package:contact_app_gita/ui/register.dart';
+import 'package:contact_app_gita/firebase_options.dart';
 import 'package:contact_app_gita/ui/splash_screen.dart';
-import 'package:contact_app_gita/ui/update.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 
 import 'data/SharedPrefsManager.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   await SharedPrefsManager().init();
   runApp(const MyApp());
 }
