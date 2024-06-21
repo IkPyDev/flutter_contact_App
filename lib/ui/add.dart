@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../data/SharedPrefsManager.dart';
+import '../data/Firebase_manager.dart';
 import 'home.dart';
 
 class Add extends StatefulWidget {
@@ -24,11 +24,10 @@ class _AddState extends State<Add> {
     String name = _nameController.text;
     String number = _numberController.text;
 
-    await SharedPrefsManager().addContact(name, number);
-    Navigator.of(context).pushReplacement(
-      MaterialPageRoute(
-        builder: (context) => const Home(),
-      ),
+    await FirebaseManager().addContact(name, number);
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => const Home()),
     );
   }
 
@@ -60,7 +59,6 @@ class _AddState extends State<Add> {
             const SizedBox(height: 20),
             TextField(
               keyboardType: TextInputType.phone,
-
               controller: _numberController,
               decoration: InputDecoration(
                 labelText: 'Phone',
