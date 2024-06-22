@@ -93,17 +93,17 @@ Widget contactItems(
             children: [
               Text(
                 name,
-                style: TextStyle(fontSize: 16, color: Colors.black),
+                style: const TextStyle(fontSize: 16, color: Colors.black),
               ),
               Text(
                 number,
-                style: TextStyle(fontSize: 14, color: Colors.grey),
+                style: const TextStyle(fontSize: 14, color: Colors.grey),
               ),
             ],
           ),
           Expanded(child: Container()),
           PopupMenuButton<String>(
-            icon: Icon(Icons.more_horiz_rounded),
+            icon: const Icon(Icons.more_horiz_rounded),
             onSelected: (value) async {
               if (value == 'Edit') {
                 Navigator.push(
@@ -171,39 +171,39 @@ Widget delete(String id, String name, BuildContext context) => Container(
     children: [
       Row(
         children: [
-          Icon(Icons.delete_forever, color: Colors.red, size: 36),
-          Spacer(),
-          Text(
+          const Icon(Icons.delete_forever, color: Colors.red, size: 36),
+          const Spacer(),
+          const Text(
             "Delete contact",
             style: TextStyle(color: Colors.grey, fontSize: 16),
           ),
-          Spacer(),
+          const Spacer(),
           InkWell(
               onTap: () {
                 Navigator.pop(context);
               },
               child: Container(
                   color: Colors.red,
-                  child: Icon(Icons.close_sharp, color: Colors.white)))
+                  child: const Icon(Icons.close_sharp, color: Colors.white)))
         ],
       ),
-      SizedBox(height: 10),
+      const SizedBox(height: 10),
       RichText(
         text: TextSpan(
           text: "Do you want to delete ",
-          style: TextStyle(fontSize: 16, color: Colors.grey),
+          style: const TextStyle(fontSize: 16, color: Colors.grey),
           children: [
             TextSpan(
               text: name,
-              style: TextStyle(fontSize: 14, color: Colors.black45),
+              style: const TextStyle(fontSize: 14, color: Colors.black45),
             )
           ],
         ),
       ),
-      SizedBox(height: 60),
+      const SizedBox(height: 60),
       Row(
         children: [
-          Spacer(),
+          const Spacer(),
           Container(
             alignment: Alignment.bottomCenter,
             height: 50,
@@ -240,13 +240,13 @@ Widget logoutUi(BuildContext context) => Container(
     children: [
       Row(
         children: [
-          Icon(Icons.delete_forever, color: Colors.red, size: 36),
-          Spacer(),
-          Text(
+          const Icon(Icons.delete_forever, color: Colors.red, size: 36),
+          const Spacer(),
+          const Text(
             "Delete contact",
             style: TextStyle(color: Colors.grey, fontSize: 16),
           ),
-          Spacer(),
+          const Spacer(),
           InkWell(
               onTap: () {
                 Navigator.pop(context);
@@ -257,12 +257,12 @@ Widget logoutUi(BuildContext context) => Container(
                   },
                   child: Container(
                       color: Colors.red,
-                      child: Icon(Icons.close_sharp, color: Colors.white))))
+                      child: const Icon(Icons.close_sharp, color: Colors.white))))
         ],
       ),
-      SizedBox(height: 10),
+      const SizedBox(height: 10),
       RichText(
-        text: TextSpan(
+        text: const TextSpan(
           text: "Do you want to ",
           style: TextStyle(fontSize: 16, color: Colors.grey),
           children: [
@@ -272,7 +272,7 @@ Widget logoutUi(BuildContext context) => Container(
           ],
         ),
       ),
-      SizedBox(height: 60),
+      const SizedBox(height: 60),
       Row(
         children: <Widget>[
           Container(
