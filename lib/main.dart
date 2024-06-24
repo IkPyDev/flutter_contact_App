@@ -1,7 +1,9 @@
+import 'package:contact_app_gita/bloc/login/login_bloc.dart';
 import 'package:contact_app_gita/firebase_options.dart';
 import 'package:contact_app_gita/ui/splash_screen.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'data/SharedPrefsManager.dart';
 

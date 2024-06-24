@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../data/SharedPrefsManager.dart';
 import 'home.dart';
-import 'login.dart';
+import 'login/login.dart';
 
 import 'package:firebase_auth/firebase_auth.dart';
 

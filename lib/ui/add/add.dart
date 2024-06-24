@@ -1,36 +1,19 @@
 import 'package:flutter/material.dart';
+import '../../bloc/add/add_bloc.dart';
+import '../../data/Firebase_manager.dart';
+import '../home.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../bloc/update/update_bloc.dart';
-import '../data/Firebase_manager.dart';
-import 'home.dart';
-
-class Update extends StatefulWidget {
-  final String id;
-  final String initialName;
-  final String initialNumber;
-
-  const Update({
-    super.key,
-    required this.id,
-    required this.initialName,
-    required this.initialNumber,
-  });
+class Add extends StatefulWidget {
+  const Add({super.key});
 
   @override
-  State<Update> createState() => _UpdateState();
+  State<Add> createState() => _AddState();
 }
 
-class _UpdateState extends State<Update> {
-  late TextEditingController _nameController;
-  late TextEditingController _numberController;
-
-  @override
-  void initState() {
-    super.initState();
-    _nameController = TextEditingController(text: widget.initialName);
-    _numberController = TextEditingController(text: widget.initialNumber);
-  }
+class _AddState extends State<Add> {
+  final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _numberController = TextEditingController();
 
   @override
   void dispose() {
@@ -39,11 +22,11 @@ class _UpdateState extends State<Update> {
     super.dispose();
   }
 
-  Future<void> _updateContact() async {
+  Future<void> _addContact() async {
     String name = _nameController.text;
     String number = _numberController.text;
 
-    await FirebaseManager().updateContact(widget.id, name, number);
+    await FirebaseManager().addContact(name, number);
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(builder: (context) => const Home()),
@@ -53,16 +36,16 @@ class _UpdateState extends State<Update> {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => UpdateBloc(),
+      create: (context) => AddBloc(),
       child: Scaffold(
-        appBar: AppBar(title: Text('Update Contact')),
+        appBar: AppBar(title: Text('Add Contact')),
         body: Padding(
           padding: const EdgeInsets.all(20.0),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[
-              Image.asset("assets/edit.png"),
+              Image.asset("assets/add_contact.png"),
               const SizedBox(height: 20),
               TextField(
                 controller: _nameController,
@@ -93,31 +76,22 @@ class _UpdateState extends State<Update> {
                 ),
               ),
               const SizedBox(height: 20),
-              BlocConsumer<UpdateBloc, UpdateState>(
+              BlocConsumer<AddBloc, AddState>(
                 listener: (context, state) {
-                  if (state is UpdateSuccess) {
+                  if(state is AddSuccess) {
                     Navigator.pushReplacement(
                       context,
                       MaterialPageRoute(builder: (context) => const Home()),
-                    );
-                  } else if (state is UpdateError) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text(state.error),
-                      ),
                     );
                   }
                 },
                 builder: (context, state) {
                   return GestureDetector(
-                    onTap: () {
-                      context.read<UpdateBloc>().add(
-                            UpdateButtonPressed(
-                              widget.id,
-                              _nameController.text,
-                              _numberController.text,
-                            ),
-                          );
+                    onTap: (){
+                      context.read<AddBloc>().add(AddContact(
+                        _nameController.text,
+                         _numberController.text,
+                      ));
                     },
                     child: Container(
                       height: 60,
@@ -128,7 +102,7 @@ class _UpdateState extends State<Update> {
                       ),
                       child: Center(
                         child: Text(
-                          "Update",
+                          "Add",
                           style: TextStyle(fontSize: 20, color: Colors.white),
                         ),
                       ),
