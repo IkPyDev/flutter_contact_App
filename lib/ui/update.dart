@@ -1,12 +1,12 @@
+import 'package:contact_app_gita/bloc/home/home_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../bloc/update/update_bloc.dart';
-import '../data/Firebase_manager.dart';
 import 'home.dart';
 
 class Update extends StatefulWidget {
-  final String id;
+  final int id;
   final String initialName;
   final String initialNumber;
 
@@ -39,16 +39,16 @@ class _UpdateState extends State<Update> {
     super.dispose();
   }
 
-  Future<void> _updateContact() async {
-    String name = _nameController.text;
-    String number = _numberController.text;
-
-    await FirebaseManager().updateContact(widget.id, name, number);
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (context) => const Home()),
-    );
-  }
+  // Future<void> _updateContact() async {
+  //   String name = _nameController.text;
+  //   String number = _numberController.text;
+  //
+  //   await FirebaseManager().updateContact(widget.id, name, number);
+  //   Navigator.pushReplacement(
+  //     context,
+  //     MaterialPageRoute(builder: (context) => const Home()),
+  //   );
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -98,7 +98,11 @@ class _UpdateState extends State<Update> {
                   if (state is UpdateSuccess) {
                     Navigator.pushReplacement(
                       context,
-                      MaterialPageRoute(builder: (context) => const Home()),
+                      MaterialPageRoute(
+                          builder: (context) => BlocProvider(
+                                create: (BuildContext c) => HomeBloc(),
+                                child: const Home(),
+                              )),
                     );
                   } else if (state is UpdateError) {
                     ScaffoldMessenger.of(context).showSnackBar(

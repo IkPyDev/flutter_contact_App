@@ -1,4 +1,8 @@
+import 'package:contact_app_gita/bloc/home/home_bloc.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import '../bloc/register/register_bloc.dart';
+import '../bloc/update/update_bloc.dart';
 import '../data/SharedPrefsManager.dart';
 import 'home.dart';
 import 'login/login.dart';
@@ -27,52 +31,6 @@ class _RegisterState extends State<Register> {
     super.dispose();
   }
 
-  // Future<void> _handleRegister() async {
-  //   String username = _usernameController.text;
-  //   String password = _passwordController.text;
-  //   String conPassword = _conPasswordController.text;
-  //
-  //   if (password == conPassword) {
-  //     await SharedPrefsManager().login(username, password, '');
-  //     Navigator.pushReplacement(
-  //       context,
-  //       MaterialPageRoute(builder: (context) => Home()),
-  //     );
-  //   } else {
-  //     setState(() {
-  //       _isError = true;
-  //     });
-  //     await Future.delayed(Duration(seconds: 10));
-  //     setState(() {
-  //       _isError = false;
-  //     });
-  //   }
-  // }
-
-  Future<void> _handleRegister() async {
-    String username = _usernameController.text;
-    String password = _passwordController.text;
-    String conPassword = _conPasswordController.text;
-
-    bool isError = await register(username, password);
-    setState(() {
-      _isError  = isError;
-    });
-    if (!isError) {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => Home()),
-      );
-    } else {
-      setState(() {
-        _isError = true;
-      });
-      await Future.delayed(Duration(seconds: 10));
-      setState(() {
-        _isError = false;
-      });
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -133,19 +91,52 @@ class _RegisterState extends State<Register> {
               ),
             ),
             const SizedBox(height: 20),
-            GestureDetector(
-              onTap: _handleRegister,
-              child: Container(
-                height: 60,
-                width: double.infinity,
-                decoration: BoxDecoration(
-                  color: Colors.red,
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: const Center(
-                  child: Text(
-                    "Register",
-                    style: TextStyle(fontSize: 20, color: Colors.white),
+            BlocListener<RegisterBloc, RegisterState>(
+              listener: (context, state) {
+                if(state is RegisterSuccess) {
+                  print("login success $state");
+                  Navigator.of(context).pushReplacement(MaterialPageRoute(
+                      builder: (BuildContext context) => BlocProvider(create: (BuildContext context) => HomeBloc(), child: const Home())));
+                } else if (state is RegisterError) {
+                  setState(() {
+                    _isError = true;
+                  });
+                  Future.delayed(const Duration(seconds: 10), () {
+                    setState(() {
+                      _isError = false;
+                    });
+                  });
+                }
+              },
+              child: GestureDetector(
+                onTap: () {
+                  if (_passwordController.text ==
+                      _conPasswordController.text) {
+                    context.read<RegisterBloc>().add(RegisterButtonPressed(
+                        _usernameController.text, _passwordController.text));
+                  } else {
+                    setState(() {
+                      _isError = true;
+                    });
+                    Future.delayed(const Duration(seconds: 10), () {
+                      setState(() {
+                        _isError = false;
+                      });
+                    });
+                  }
+                },
+                child: Container(
+                  height: 60,
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    color: Colors.red,
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: const Center(
+                    child: Text(
+                      "Register",
+                      style: TextStyle(fontSize: 20, color: Colors.white),
+                    ),
                   ),
                 ),
               ),
@@ -177,13 +168,60 @@ class _RegisterState extends State<Register> {
   }
 }
 
-Future<bool> register(String login, String password) async {
-  try {
-    var user = await FirebaseAuth.instance
-        .createUserWithEmailAndPassword(email: login, password: password);
-    return false;
-  } catch (e) {
-    print("Error $e");
-    return true;
-  }
-}
+// Future<bool> register(String login, String password) async {
+//   try {
+//     var user = await FirebaseAuth.instance
+//         .createUserWithEmailAndPassword(email: login, password: password);
+//     return false;
+//   } catch (e) {
+//     print("Error $e");
+//     return true;
+//   }
+// }
+
+// Future<void> _handleRegister() async {
+//   String username = _usernameController.text;
+//   String password = _passwordController.text;
+//   String conPassword = _conPasswordController.text;
+//
+//   if (password == conPassword) {
+//     await SharedPrefsManager().login(username, password, '');
+//     Navigator.pushReplacement(
+//       context,
+//       MaterialPageRoute(builder: (context) => Home()),
+//     );
+//   } else {
+//     setState(() {
+//       _isError = true;
+//     });
+//     await Future.delayed(Duration(seconds: 10));
+//     setState(() {
+//       _isError = false;
+//     });
+//   }
+// }
+//
+// Future<void> _handleRegister() async {
+//   String username = _usernameController.text;
+//   String password = _passwordController.text;
+//   String conPassword = _conPasswordController.text;
+//
+//   bool isError = await register(username, password);
+//   setState(() {
+//     _isError  = isError;
+//   });
+//   if (!isError) {
+//     Navigator.pushReplacement(
+//       context,
+//       MaterialPageRoute(builder: (context) => Home()),
+//     );
+//   } else {
+//     setState(() {
+//       _isError = true;
+//     });
+//     await Future.delayed(Duration(seconds: 10));
+//     setState(() {
+//       _isError = false;
+//     });
+//   }
+// }

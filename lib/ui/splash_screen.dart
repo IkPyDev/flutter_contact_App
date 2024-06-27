@@ -1,9 +1,13 @@
 import 'dart:async';
 
 import 'package:contact_app_gita/bloc/login/login_bloc.dart';
+import 'package:contact_app_gita/data/db_manager.dart';
 import 'package:contact_app_gita/ui/login/login.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+
+import '../bloc/home/home_bloc.dart';
+import 'home.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -19,16 +23,28 @@ class _SplashScreenState extends State<SplashScreen>
   @override
   void initState() {
     super.initState();
-    Timer(const Duration(seconds: 3), () {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (context) => BlocProvider(
-            create: (BuildContext context) => LoginBloc(),
-            child: const Login(),
+    Timer(const Duration(seconds: 3), () async {
+      if (await DbManager().isLogin()) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => BlocProvider(
+              create: (BuildContext context) =>HomeBloc(),
+              child: const Home(),
+            ),
           ),
-        ),
-      );
+        );
+      } else {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => BlocProvider(
+              create: (BuildContext context) => LoginBloc(),
+              child: const Login(),
+            ),
+          ),
+        );
+      }
     });
   }
 

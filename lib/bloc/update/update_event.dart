@@ -4,7 +4,7 @@ part of 'update_bloc.dart';
 sealed class UpdateEvent {}
 
 class UpdateButtonPressed extends UpdateEvent {
-  final String id;
+  final int id;
   final String name;
   final String phone;
 

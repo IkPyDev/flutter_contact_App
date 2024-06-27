@@ -5,7 +5,7 @@ sealed class HomeEvent {}
 
 
 class DeleteButtonPressed extends HomeEvent {
-  final String id;
+  final int id;
 
   DeleteButtonPressed( this.id);
 }

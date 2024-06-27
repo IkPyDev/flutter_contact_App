@@ -18,11 +18,9 @@ class _LoginState extends State<Login> {
   final TextEditingController _passwordController = TextEditingController();
   bool _isObscure = true;
   bool _isError = false;
-  late LoginBloc _loginBloc;
 
   @override
   void initState() {
-    _loginBloc = BlocProvider.of<LoginBloc>(context);
     super.initState();
   }
 
@@ -120,15 +118,18 @@ class _LoginState extends State<Login> {
             BlocConsumer<LoginBloc, LoginState>(
               listener: (context, state) {
                 if (state is LoginSuccess) {
+                  print(" UI Login success" );
                   Navigator.pushReplacement(
                     context,
                     MaterialPageRoute(builder: (context) => const Home()),
                   );
-                } else if (state is LoginError) {
-                  setState(() async {
+                }else {
+                  print(" UI Login error" );
+                  setState(()  {
                     _isError = true;
+                    print(" UI Login error 121" );
 
-                    await Duration(seconds: 10);
+                    const Duration(seconds: 10);
                     setState(() {
                       _isError = false;
                     });
@@ -138,7 +139,7 @@ class _LoginState extends State<Login> {
               builder: (context, state) {
                 return InkWell(
                   onTap: () {
-                    _loginBloc.add(
+                    context.read<LoginBloc>().add(
                           LoginButtonPressed(_usernameController.text,
                               _passwordController.text),
                         );

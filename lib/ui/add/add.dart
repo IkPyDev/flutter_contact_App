@@ -1,3 +1,4 @@
+import 'package:contact_app_gita/bloc/home/home_bloc.dart';
 import 'package:flutter/material.dart';
 import '../../bloc/add/add_bloc.dart';
 import '../../data/Firebase_manager.dart';
@@ -81,7 +82,7 @@ class _AddState extends State<Add> {
                   if(state is AddSuccess) {
                     Navigator.pushReplacement(
                       context,
-                      MaterialPageRoute(builder: (context) => const Home()),
+                      MaterialPageRoute(builder: (context) =>BlocProvider(create: (BuildContext c) => HomeBloc(),child:const Home() ,) ),
                     );
                   }
                 },

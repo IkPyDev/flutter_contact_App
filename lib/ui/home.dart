@@ -1,3 +1,4 @@
+import 'package:contact_app_gita/bloc/login/login_bloc.dart';
 import 'package:contact_app_gita/cons/text_steles.dart';
 import 'package:contact_app_gita/ui/add/add.dart';
 import 'package:flutter/material.dart';
@@ -77,8 +78,8 @@ class _HomeState extends State<Home> {
                       var contact = state.contacts[index];
                       return BlocBuilder<HomeBloc, HomeState>(
                         builder: (context, state) {
-                          return contactItems(
-                              context, contact.id, contact.name, contact.phone);
+                          return contactItems(context, contact.id!,
+                              contact.name, contact.number);
                         },
                       );
                     },
@@ -134,8 +135,7 @@ class _HomeState extends State<Home> {
   }
 }
 
-Widget contactItems(
-        BuildContext context, String id, String name, String number) =>
+Widget contactItems(BuildContext context, int id, String name, String number) =>
     SizedBox(
       height: 80,
       child: Row(
@@ -225,7 +225,7 @@ Widget contactItems(
 //   );
 // }
 
-Widget delete(String id, String name, BuildContext context) => Container(
+Widget delete(int id, String name, BuildContext context) => Container(
       height: 200,
       padding: const EdgeInsets.all(12.0),
       child: Column(
@@ -360,63 +360,65 @@ Widget logoutUi(BuildContext context) => Container(
             Row(
               children: <Widget>[
                 BlocConsumer<HomeBloc, HomeState>(
-  listener: (context, state) {
-    // TODO: implement listener
-  },
-  builder: (context, state) {
-    return Container(
-                  alignment: Alignment.bottomCenter,
-                  height: 50,
-                  width: 120,
-                  decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(18),
-                      border: Border.all(color: Colors.red, width: 1)),
-                  child: InkWell(
-                      onTap: () async {
-                        context.read<HomeBloc>().add(UnRegister());
-                        Navigator.pop(context);
-                      },
-                      child: const Center(
-                          child: Text(
-                        "UnRegister",
-                        style: TextStyle(
-                            fontSize: 18,
-                            color: Colors.red,
-                            fontWeight: FontWeight.bold),
-                      ))),
-                );
-  },
-),
+                  listener: (context, state) {
+                    // TODO: implement listener
+                  },
+                  builder: (context, state) {
+                    return Container(
+                      alignment: Alignment.bottomCenter,
+                      height: 50,
+                      width: 120,
+                      decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(18),
+                          border: Border.all(color: Colors.red, width: 1)),
+                      child: InkWell(
+                          onTap: () async {
+                            context.read<HomeBloc>().add(UnRegister());
+                            Navigator.pushReplacement(context,
+                                MaterialPageRoute(builder: (context) => BlocProvider(create: (BuildContext c) => LoginBloc(),child: const Login(),))
+                            );
+                          },
+                          child: const Center(
+                              child: Text(
+                            "UnRegister",
+                            style: TextStyle(
+                                fontSize: 18,
+                                color: Colors.red,
+                                fontWeight: FontWeight.bold),
+                          ))),
+                    );
+                  },
+                ),
                 const Spacer(),
                 BlocConsumer<HomeBloc, HomeState>(
-  listener: (context, state) {
-  },
-  builder: (context, state) {
-    return Container(
-                  alignment: Alignment.bottomCenter,
-                  height: 50,
-                  width: 120,
-                  decoration: BoxDecoration(
-                      color: Colors.red,
-                      borderRadius: BorderRadius.circular(18)),
-                  child: InkWell(
-                      onTap: () async {
-                        context.read<HomeBloc>().add(LogOut());
+                  listener: (context, state) {},
+                  builder: (context, state) {
+                    return Container(
+                      alignment: Alignment.bottomCenter,
+                      height: 50,
+                      width: 120,
+                      decoration: BoxDecoration(
+                          color: Colors.red,
+                          borderRadius: BorderRadius.circular(18)),
+                      child: InkWell(
+                          onTap: () async {
 
-                        Navigator.pop(context);
-                      },
-                      child: const Center(
-                          child: Text(
-                        "Logout",
-                        style: TextStyle(
-                            fontSize: 18,
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold),
-                      ))),
-                );
-  },
-),
+                            Navigator.pushReplacement(context,
+                            MaterialPageRoute(builder: (context) => BlocProvider(create: (BuildContext c) => LoginBloc(),child: const Login(),))
+                            );
+                          },
+                          child: const Center(
+                              child: Text(
+                            "Logout",
+                            style: TextStyle(
+                                fontSize: 18,
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold),
+                          ))),
+                    );
+                  },
+                ),
               ],
             )
           ],
