@@ -7,7 +7,7 @@ import '../../bloc/login/login_bloc.dart';
 import '../home.dart';
 
 class Login extends StatefulWidget {
-  const Login({super.key});
+  const Login({Key? key}) : super(key: key);
 
   @override
   State<Login> createState() => _LoginState();
@@ -20,60 +20,11 @@ class _LoginState extends State<Login> {
   bool _isError = false;
 
   @override
-  void initState() {
-    super.initState();
-  }
-
-  @override
   void dispose() {
     _usernameController.dispose();
     _passwordController.dispose();
     super.dispose();
   }
-
-  // Future<void> _handleLogin() async {
-  //   String username = _usernameController.text;
-  //   String password = _passwordController.text;
-  //
-  //   var logins = login(username, password);
-  //   bool isLoggedIn = SharedPrefsManager().signIn(username, password);
-  //
-  //   if (isLoggedIn) {
-  //     Navigator.pushReplacement(
-  //       context,
-  //       MaterialPageRoute(builder: (context) => const Home()),
-  //     );
-  //   } else {
-  //     setState(() {
-  //       _isError = true;
-  //     });
-  //     await Future.delayed(const Duration(seconds: 10));
-  //     setState(() {
-  //       _isError = false;
-  //     });
-  //   }
-  // }
-  // Future<void> _handleLogin() async {
-  //   String username = _usernameController.text;
-  //   String password = _passwordController.text;
-  //
-  //   bool isError = await login(username, password);
-  //   setState(() {
-  //     _isError = isError;
-  //   });
-  //
-  //   if (!isError) {
-  //     Navigator.pushReplacement(
-  //       context,
-  //       MaterialPageRoute(builder: (context) => const Home()),
-  //     );
-  //   } else {
-  //     await Future.delayed(const Duration(seconds: 10));
-  //     setState(() {
-  //       _isError = false;
-  //     });
-  //   }
-  // }
 
   @override
   Widget build(BuildContext context) {
@@ -90,7 +41,7 @@ class _LoginState extends State<Login> {
               controller: _usernameController,
               decoration: InputDecoration(
                 labelText: 'Username',
-                border: OutlineInputBorder(),
+                border: const OutlineInputBorder(),
                 errorText: _isError ? 'Incorrect username or password' : null,
               ),
             ),
@@ -118,46 +69,93 @@ class _LoginState extends State<Login> {
             BlocConsumer<LoginBloc, LoginState>(
               listener: (context, state) {
                 if (state is LoginSuccess) {
-                  print(" UI Login success" );
                   Navigator.pushReplacement(
                     context,
                     MaterialPageRoute(builder: (context) => const Home()),
                   );
-                }else {
-                  print(" UI Login error" );
-                  setState(()  {
+                } else if (state is LoginError) {
+                  setState(() {
                     _isError = true;
-                    print(" UI Login error 121" );
-
-                    const Duration(seconds: 10);
+                  });
+                  Future.delayed(const Duration(seconds: 10), () {
                     setState(() {
                       _isError = false;
                     });
                   });
+                } else if (state is LoginInitial) {
+                  setState(() {
+                    _isError = false;
+                  });
                 }
               },
               builder: (context, state) {
-                return InkWell(
-                  onTap: () {
-                    context.read<LoginBloc>().add(
-                          LoginButtonPressed(_usernameController.text,
-                              _passwordController.text),
-                        );
-                  },
-                  child: Container(
-                    height: 60,
-                    width: double.infinity,
-                    decoration: BoxDecoration(
-                      color: Colors.red,
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: const Center(
-                      child: Text(
-                        "Login",
-                        style: TextStyle(fontSize: 20, color: Colors.white),
-                      ),
-                    ),
-                  ),
+                return Column(
+                  children: [
+                    Builder(
+                      builder: (context) {
+                        if (state is LoginLoading) {
+                          return const Padding(
+                            padding: EdgeInsets.symmetric(vertical: 10),
+                            child: CircularProgressIndicator(
+                              color: Colors.red,
+                            ),
+                          );
+                        } else if (state is LoginInitial) {
+                          return InkWell(
+                            onTap: () {
+                              context.read<LoginBloc>().add(
+                                    LoginButtonPressed(
+                                      _usernameController.text,
+                                      _passwordController.text,
+                                    ),
+                                  );
+                            },
+                            child: Container(
+                              height: 60,
+                              width: double.infinity,
+                              decoration: BoxDecoration(
+                                color: Colors.red,
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              child: const Center(
+                                child: Text(
+                                  "Login",
+                                  style: TextStyle(
+                                      fontSize: 20, color: Colors.white),
+                                ),
+                              ),
+                            ),
+                          );
+                        } else {
+                          return InkWell(
+                            onTap: () {
+                              context.read<LoginBloc>().add(
+                                    LoginButtonPressed(
+                                      _usernameController.text,
+                                      _passwordController.text,
+                                    ),
+                                  );
+                            },
+                            child: Container(
+                              height: 60,
+                              width: double.infinity,
+                              decoration: BoxDecoration(
+                                color: Colors.red,
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              child: const Center(
+                                child: Text(
+                                  "Login",
+                                  style: TextStyle(
+                                      fontSize: 20, color: Colors.white),
+                                ),
+                              ),
+                            ),
+                          );
+                        }
+                      },
+                    )
+                  ],
                 );
               },
             ),
@@ -176,16 +174,18 @@ class _LoginState extends State<Login> {
               },
               child: RichText(
                 text: const TextSpan(
-                    text: "Don’t have an account yet?  ",
-                    children: [
-                      TextSpan(
-                        text: 'Sign up here',
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: Colors.grey), // Bold text style
+                  text: "Don’t have an account yet?  ",
+                  children: [
+                    TextSpan(
+                      text: 'Sign up here',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.grey,
                       ),
-                    ],
-                    style: TextStyle(color: Colors.grey)),
+                    ),
+                  ],
+                  style: TextStyle(color: Colors.grey),
+                ),
               ),
             )
           ],
@@ -194,14 +194,3 @@ class _LoginState extends State<Login> {
     );
   }
 }
-//
-// Future<bool> login(String login, String password) async {
-//   try {
-//     var user = await FirebaseAuth.instance
-//         .signInWithEmailAndPassword(email: login, password: password);
-//     return false;
-//   } catch (e) {
-//     print("Error $e");
-//     return true;
-//   }
-// }

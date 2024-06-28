@@ -6,6 +6,11 @@ import 'package:contact_app_gita/data/db_manager.dart';
 import 'package:contact_app_gita/data/db_manager.dart';
 import 'package:contact_app_gita/data/db_manager.dart';
 import 'package:contact_app_gita/data/db_manager.dart';
+import 'package:contact_app_gita/data/hive/contact_model_hive.dart';
+import 'package:contact_app_gita/data/hive/hive_manager.dart';
+import 'package:contact_app_gita/data/hive/hive_manager.dart';
+import 'package:contact_app_gita/data/hive/hive_manager.dart';
+import 'package:contact_app_gita/data/hive/hive_manager.dart';
 import 'package:meta/meta.dart';
 
 import '../../data/Firebase_manager.dart';
@@ -20,7 +25,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
 
       emit(HomeLoading());
       try {
-        final contacts = await DbManager().getContacts();
+        final contacts = await HiveManager().getContacts();
         emit(HomeSuccess(contacts));
       } catch (e) {
         emit(HomeError(e.toString()));
@@ -30,7 +35,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     on<LoadContacts>((event, emit) async {
       emit(HomeLoading());
       try {
-        final contacts = await DbManager().getContacts();
+        final contacts = await HiveManager().getContacts();
         emit(HomeSuccess(contacts));
       } catch (e) {
         emit(HomeError(e.toString()));
@@ -41,7 +46,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       print(" name delete ${event.id}");
       try {
         print(" name delete ${event.id}");
-        await DbManager().deleteContact(event.id);
+        await HiveManager().deleteContact(event.id);
         emit(DeleteSuccess());
       } catch (e) {
         emit(HomeError(e.toString()));
@@ -60,7 +65,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     on<UnRegister>((event, emit) async {
       emit(UnRegisterState());
       try {
-        await DbManager().deleteAll();
+        await HiveManager().deleteAll();
         emit(UnRegisterState());
       } catch (e) {
         emit(HomeError(e.toString()));

@@ -1,5 +1,6 @@
 import 'package:bloc/bloc.dart';
 import 'package:contact_app_gita/data/db_manager.dart';
+import 'package:contact_app_gita/data/hive/hive_manager.dart';
 import 'package:meta/meta.dart';
 
 import '../../data/Firebase_manager.dart';
@@ -12,7 +13,7 @@ class RegisterBloc extends Bloc<RegisterEvent, RegisterState> {
     on<RegisterButtonPressed>((event, emit) async {
 
 
-      bool isLogins =  await DbManager().addUser(event.email, event.password);
+      bool isLogins =  await HiveManager().addUser(event.email, event.password);
       if(isLogins) {
         print("login success $isLogins");
         emit(RegisterSuccess());

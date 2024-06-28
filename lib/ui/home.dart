@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:contact_app_gita/bloc/login/login_bloc.dart';
 import 'package:contact_app_gita/cons/text_steles.dart';
 import 'package:contact_app_gita/ui/add/add.dart';
@@ -142,10 +143,12 @@ Widget contactItems(BuildContext context, int id, String name, String number) =>
         children: [
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 10),
-            child: Image.network(
-              AppIcons.icons1,
+            child: CachedNetworkImage(
+             imageUrl:  AppIcons.icons1,
               height: 50,
               width: 50,
+              placeholder: (context, url) => const CircularProgressIndicator(color: Colors.red,),
+              errorWidget: (context, url, error) => const Icon(Icons.error, color: Colors.red),
             ),
           ),
           Column(

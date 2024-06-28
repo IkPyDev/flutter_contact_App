@@ -1,5 +1,6 @@
 import 'package:bloc/bloc.dart';
 import 'package:contact_app_gita/data/db_manager.dart';
+import 'package:contact_app_gita/data/hive/hive_manager.dart';
 import 'package:meta/meta.dart';
 
 import '../../data/Firebase_manager.dart';
@@ -13,7 +14,7 @@ class AddBloc extends Bloc<AddEvent, AddState> {
       if (event is AddContact) {
         emit(AddLoading());
         try {
-          await DbManager().addContact(event.name, event.phone);
+          await HiveManager().addContact(event.name, event.phone);
           emit(AddSuccess());
         } catch (e) {
           emit(AddError(e.toString()));

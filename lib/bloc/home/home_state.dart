@@ -9,7 +9,7 @@ final class HomeLoading extends HomeState {}
 
 
 final class HomeSuccess extends HomeState {
-  final List<ContactModel> contacts;
+  final List<ContactModelHive> contacts;
 
   HomeSuccess(this.contacts);
 }
