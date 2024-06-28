@@ -7,6 +7,6 @@ class UpdateButtonPressed extends UpdateEvent {
   final int id;
   final String name;
   final String phone;
-
-  UpdateButtonPressed( this.id, this.name, this.phone);
+  final ContactModelHive h;
+  UpdateButtonPressed( this.id, this.name, this.phone , this.h);
 }

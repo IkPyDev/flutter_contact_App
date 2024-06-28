@@ -14,7 +14,9 @@ class HiveManager {
   //   final appDocumentDir = await getApplicationDocumentsDirectory();
   //    Hive.init(appDocumentDir.path);
   //   Hive.registerAdapter(ContactModelHiveAdapter());
-  //   await Hive.openBox<ContactModelHive>(contactBoxName);
+  //   await Hive.open
+  //
+  //   Box<ContactModelHive>(contactBoxName);
   //   await Hive.openBox(userBoxName);
   // }
 
@@ -25,18 +27,24 @@ class HiveManager {
   }
 
   Future<void> updateContact(ContactModelHive contact) async {
-    final box = Hive.box<ContactModelHive>(contactBoxName);
-    final Map<dynamic, ContactModelHive> deliveriesMap = box.toMap();
-    dynamic desiredKey;
-    deliveriesMap.forEach((key, value){
-      if (value.id == contact.id) {
-        desiredKey = key;
-      }
-    });
-     box.put(desiredKey, contact);
+    // final box = Hive.box<ContactModelHive>(contactBoxName);
+    // final Map<dynamic, ContactModelHive> deliveriesMap = box.toMap();
+    // dynamic desiredKey;
+    // deliveriesMap.forEach((key, value){
+    //   if (value.id == contact.id) {
+    //     desiredKey = key;
+    //   }
+    // });
+    //  box.put(desiredKey, contact);
+    contact.save();
   }
 
   Future<void> deleteContact(int id) async {
+
+    void delete(int key) {
+      final box = Hive.box('contact');
+      box.delete(key);
+    }
     // print("delete $id  bolmoqda "  );
     final box = Hive.box<ContactModelHive>(contactBoxName);
     // print("all keys ${box.keys.toList()} " );
@@ -53,9 +61,9 @@ class HiveManager {
 
   Future<List<ContactModelHive>> getContacts() async {
     final box = Hive.box<ContactModelHive>(contactBoxName);
-    print(box.keys.toList());
+    // print(box.keys.toList());
     var a = List.generate(box.length, (index) => box.getAt(index)!);
-    print("get contacts $a");
+    // print("get contacts $a");
     return a;
   }
 
@@ -71,7 +79,7 @@ class HiveManager {
 
   }
 
-  Future<bool> isLogin() async {
+  bool isLogin()  {
     final box = Hive.box(userBoxName);
     return box.isNotEmpty;
   }
@@ -91,7 +99,7 @@ class HiveManager {
   Future<bool> checkUser(String login, String password) async {
     final box = Hive.box(userBoxName);
     var map = box.values.where((element) => element['login'] == login && element['password'] == password);
-    print("check user $map"  );
+    // print("check user $map"  );
     return map.isNotEmpty;
   }
 

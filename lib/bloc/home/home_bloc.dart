@@ -1,19 +1,7 @@
 import 'package:bloc/bloc.dart';
-import 'package:contact_app_gita/data/UserData.dart';
-import 'package:contact_app_gita/data/contact_model.dart';
-import 'package:contact_app_gita/data/db_manager.dart';
-import 'package:contact_app_gita/data/db_manager.dart';
-import 'package:contact_app_gita/data/db_manager.dart';
-import 'package:contact_app_gita/data/db_manager.dart';
-import 'package:contact_app_gita/data/db_manager.dart';
 import 'package:contact_app_gita/data/hive/contact_model_hive.dart';
 import 'package:contact_app_gita/data/hive/hive_manager.dart';
-import 'package:contact_app_gita/data/hive/hive_manager.dart';
-import 'package:contact_app_gita/data/hive/hive_manager.dart';
-import 'package:contact_app_gita/data/hive/hive_manager.dart';
 import 'package:meta/meta.dart';
-
-import '../../data/Firebase_manager.dart';
 
 part 'home_event.dart';
 
@@ -22,7 +10,6 @@ part 'home_state.dart';
 class HomeBloc extends Bloc<HomeEvent, HomeState> {
   HomeBloc() : super(HomeInitial()) {
     on<HomeEvent>((event, emit) async {
-
       emit(HomeLoading());
       try {
         final contacts = await HiveManager().getContacts();
@@ -32,11 +19,13 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       }
     });
 
-    on<LoadContacts>((event, emit) async {
+    on<LoadContactsEvent>((event, emit) async {
       emit(HomeLoading());
       try {
+        print('call load contacts event in bloc');
         final contacts = await HiveManager().getContacts();
         emit(HomeSuccess(contacts));
+        print('emit success in bloc');
       } catch (e) {
         emit(HomeError(e.toString()));
       }
@@ -54,7 +43,6 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     });
 
     on<LogOut>((event, emit) async {
-
       try {
         emit(LogOutState());
       } catch (e) {
@@ -71,8 +59,5 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
         emit(HomeError(e.toString()));
       }
     });
-
-
-
   }
 }

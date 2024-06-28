@@ -1,4 +1,5 @@
 import 'package:contact_app_gita/bloc/home/home_bloc.dart';
+import 'package:contact_app_gita/data/hive/contact_model_hive.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -9,12 +10,14 @@ class Update extends StatefulWidget {
   final int id;
   final String initialName;
   final String initialNumber;
+  final ContactModelHive contact;
 
   const Update({
     super.key,
     required this.id,
     required this.initialName,
     required this.initialNumber,
+    required this.contact,
   });
 
   @override
@@ -115,11 +118,26 @@ class _UpdateState extends State<Update> {
                 builder: (context, state) {
                   return GestureDetector(
                     onTap: () {
+
+                      widget.contact.name = _nameController.text;
+                      widget.contact.number = _numberController.text;
+                      widget.contact.save();
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => BlocProvider(
+                            create: (BuildContext c) => HomeBloc(),
+                            child: const Home(),
+                          ),
+                        ),
+                      );
+
                       context.read<UpdateBloc>().add(
                             UpdateButtonPressed(
                               widget.id,
                               _nameController.text,
                               _numberController.text,
+                              widget.contact,
                             ),
                           );
                     },

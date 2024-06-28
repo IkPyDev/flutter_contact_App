@@ -10,7 +10,7 @@ class DeleteButtonPressed extends HomeEvent {
   DeleteButtonPressed( this.id);
 }
 
-class LoadContacts extends HomeEvent {}
+class LoadContactsEvent extends HomeEvent {}
 class LogOut extends HomeEvent {}
 class UnRegister extends HomeEvent {}
 

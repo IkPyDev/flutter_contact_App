@@ -2,6 +2,8 @@ import 'dart:async';
 
 import 'package:contact_app_gita/bloc/login/login_bloc.dart';
 import 'package:contact_app_gita/data/db_manager.dart';
+import 'package:contact_app_gita/data/hive/contact_model_hive.dart';
+import 'package:contact_app_gita/data/hive/hive_manager.dart';
 import 'package:contact_app_gita/ui/login/login.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -24,7 +26,7 @@ class _SplashScreenState extends State<SplashScreen>
   void initState() {
     super.initState();
     Timer(const Duration(seconds: 3), () async {
-      if (await DbManager().isLogin()) {
+      if (HiveManager().isLogin()) {
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(

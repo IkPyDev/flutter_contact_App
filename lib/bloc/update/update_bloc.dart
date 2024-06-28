@@ -17,7 +17,7 @@ class UpdateBloc extends Bloc<UpdateEvent, UpdateState> {
         emit(UpdateLoading());
         try {
           var contact = ContactModelHive(id: event.id,name: event.name, number: event.phone);
-          await HiveManager().updateContact(contact);
+          await HiveManager().updateContact(event.h);
           emit(UpdateSuccess());
         } catch (e) {
           emit(UpdateError(e.toString()));

@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:contact_app_gita/bloc/login/login_bloc.dart';
 import 'package:contact_app_gita/cons/text_steles.dart';
+import 'package:contact_app_gita/data/hive/contact_model_hive.dart';
 import 'package:contact_app_gita/ui/add/add.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -20,6 +21,7 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
   List<UserData> contacts = [];
+  int counter = 0;
 
   @override
   void initState() {
@@ -30,7 +32,7 @@ class _HomeState extends State<Home> {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => HomeBloc()..add(LoadContacts()),
+      create: (context) => HomeBloc()..add(LoadContactsEvent()),
       child: Scaffold(
         appBar: AppBar(
           forceMaterialTransparency: true,
@@ -66,10 +68,14 @@ class _HomeState extends State<Home> {
             children: [
               BlocConsumer<HomeBloc, HomeState>(builder: (context, state) {
                 if (state is HomeLoading) {
+                  print('loading');
                   return const Center(child: CircularProgressIndicator());
                 } else if (state is HomeError) {
+                  print('error ');
                   return Center(child: Text("Error: ${state.error}"));
                 } else if (state is HomeSuccess) {
+                  ++counter;
+                  print("keldi ui ga ${state.contacts.length}  $counter ");
                   return ListView.separated(
                     separatorBuilder: (_, __) {
                       return const Divider(height: 2, color: Colors.grey);
@@ -77,12 +83,8 @@ class _HomeState extends State<Home> {
                     itemCount: state.contacts.length,
                     itemBuilder: (context, index) {
                       var contact = state.contacts[index];
-                      return BlocBuilder<HomeBloc, HomeState>(
-                        builder: (context, state) {
-                          return contactItems(context, contact.id!,
-                              contact.name, contact.number);
-                        },
-                      );
+                      return contactItems(context, contact.id, contact.name,
+                          contact.number, contact);
                     },
                   );
                 } else {
@@ -95,7 +97,7 @@ class _HomeState extends State<Home> {
                 } else if (state is DeleteSuccess) {
                   ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
                       content: Text("Contact deleted successfully")));
-                  context.read<HomeBloc>().add(LoadContacts());
+                  // context.read<HomeBloc>().add(LoadContacts());
                 } else if (state is LogOutState) {
                   Navigator.pushReplacement(
                     context,
@@ -136,7 +138,8 @@ class _HomeState extends State<Home> {
   }
 }
 
-Widget contactItems(BuildContext context, int id, String name, String number) =>
+Widget contactItems(BuildContext context, int id, String name, String number,
+        ContactModelHive h) =>
     SizedBox(
       height: 80,
       child: Row(
@@ -144,11 +147,14 @@ Widget contactItems(BuildContext context, int id, String name, String number) =>
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 10),
             child: CachedNetworkImage(
-             imageUrl:  AppIcons.icons1,
+              imageUrl: AppIcons.icons1,
               height: 50,
               width: 50,
-              placeholder: (context, url) => const CircularProgressIndicator(color: Colors.red,),
-              errorWidget: (context, url, error) => const Icon(Icons.error, color: Colors.red),
+              placeholder: (context, url) => const CircularProgressIndicator(
+                color: Colors.red,
+              ),
+              errorWidget: (context, url, error) =>
+                  const Icon(Icons.error, color: Colors.red),
             ),
           ),
           Column(
@@ -177,6 +183,7 @@ Widget contactItems(BuildContext context, int id, String name, String number) =>
                       id: id,
                       initialName: name,
                       initialNumber: number,
+                      contact: h,
                     ),
                   ),
                 );
@@ -184,7 +191,7 @@ Widget contactItems(BuildContext context, int id, String name, String number) =>
                 showDialog(
                     context: context,
                     builder: (BuildContext context) {
-                      return Dialog(child: delete(id, name, context));
+                      return Dialog(child: delete(id, name, context, h));
                     });
               }
             },
@@ -228,7 +235,8 @@ Widget contactItems(BuildContext context, int id, String name, String number) =>
 //   );
 // }
 
-Widget delete(int id, String name, BuildContext context) => Container(
+Widget delete(int id, String name, BuildContext context, ContactModelHive h) =>
+    Container(
       height: 200,
       padding: const EdgeInsets.all(12.0),
       child: Column(
@@ -286,18 +294,22 @@ Widget delete(int id, String name, BuildContext context) => Container(
                     },
                     builder: (context, state) {
                       return InkWell(
-                          onTap: () {
-                            context
-                                .read<HomeBloc>()
-                                .add(DeleteButtonPressed(id));
-                            context.read<HomeBloc>().add(LoadContacts());
+                          onTap: () async {
+                            // context
+                            //     .read<HomeBloc>()
+                            //     .add(DeleteButtonPressed(id));
+                            // context.read<HomeBloc>().add(LoadContactsEvent());
 
+                            print("delete keldi");
+                            h.delete();
+                            // h.save();
                             Navigator.pop(context);
-                            Navigator.pushReplacement(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => const Home(),
-                                ));
+                            context.read<HomeBloc>().add(LoadContactsEvent());
+                            // Navigator.pushReplacement(
+                            //     context,
+                            //     MaterialPageRoute(
+                            //       builder: (context) => const Home(),
+                            //     ));
                           },
                           child: const Center(
                               child: Text(
@@ -378,9 +390,14 @@ Widget logoutUi(BuildContext context) => Container(
                       child: InkWell(
                           onTap: () async {
                             context.read<HomeBloc>().add(UnRegister());
-                            Navigator.pushReplacement(context,
-                                MaterialPageRoute(builder: (context) => BlocProvider(create: (BuildContext c) => LoginBloc(),child: const Login(),))
-                            );
+                            Navigator.pushReplacement(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => BlocProvider(
+                                          create: (BuildContext c) =>
+                                              LoginBloc(),
+                                          child: const Login(),
+                                        )));
                           },
                           child: const Center(
                               child: Text(
@@ -406,10 +423,14 @@ Widget logoutUi(BuildContext context) => Container(
                           borderRadius: BorderRadius.circular(18)),
                       child: InkWell(
                           onTap: () async {
-
-                            Navigator.pushReplacement(context,
-                            MaterialPageRoute(builder: (context) => BlocProvider(create: (BuildContext c) => LoginBloc(),child: const Login(),))
-                            );
+                            Navigator.pushReplacement(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => BlocProvider(
+                                          create: (BuildContext c) =>
+                                              LoginBloc(),
+                                          child: const Login(),
+                                        )));
                           },
                           child: const Center(
                               child: Text(
